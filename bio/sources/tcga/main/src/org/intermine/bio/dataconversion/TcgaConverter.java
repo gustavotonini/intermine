@@ -57,6 +57,7 @@ public class TcgaConverter extends BioFileConverter
     private static final String HOMOSAPIENS_TAX_ID = "9606";
 	
 	private static Map<String, Item> patients = null;
+	private static Map<String, Item> aliquots = null;
 
 
     /**
@@ -95,6 +96,14 @@ public class TcgaConverter extends BioFileConverter
         } else if ("3_nationwidechildrens.org_clinical_follow_up_v1.0_nte_ov.txt"
                 .equals(currentFile.getName())) {
             processClinical(reader, sub, org, "TCGAClinicalFollowUpNTE");
+        } else if ("3_nationwidechildrens.org_clinical_radiation_ov.txt"
+                .equals(currentFile.getName())) {
+            processClinical(reader, sub, org, "TCGAClinicalRadiation");
+        } else if ("3_nationwidechildrens.org_biospecimen_aliquot_ov.txt"
+                .equals(currentFile.getName())) {
+            processAliquot(reader, sub, org);
+        } else if (currentFile.getName().matches("4_SOURS_p_.*SNP_N_GenomeWideSNP.*.seg.v2.txt") ) {
+            processCNV(reader, sub, org);			
         } else {
             throw new IllegalArgumentException("Unexpected file: "
                     + currentFile.getName());
@@ -111,8 +120,121 @@ public class TcgaConverter extends BioFileConverter
         org.setAttribute("taxonId", HOMOSAPIENS_TAX_ID);
         store(org);
     }
+
+	private void processCNV(Reader reader, Item submission, Item organism)
+		throws IOException, ObjectStoreException {
+        Iterator<?> tsvIter;
+        try {
+            tsvIter = FormattedTextParser.parseTabDelimitedReader(reader);
+        } catch (Exception e) {
+            throw new BuildException("cannot parse file: " + getCurrentFile(), e);
+        }
+        String [] headers = null;
+        int lineNumber = 0;
+		Item patient = null;
+
+        //drugs = new HashMap<String, String>();
+
+        while (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+
+            if (lineNumber == 0) {
+                // column headers - strip off any extra columns - FlyAtlas
+                // not necessary for FlyExpressionScore, but OK to keep the code
+                int end = 0;
+                for (int i = 0; i < line.length; i++) {
+                    if (StringUtils.isEmpty(line[i])) {
+                        break;
+                    }
+                    end++;
+                }
+                headers = new String[end];
+                System.arraycopy(line, 0, headers, 0, end);
+				
+				//skip one useless line following the header
+				line = (String[]) tsvIter.next();
+				lineNumber +=1;
+				
+            } else {
+                String aliquotUUID = line[0]; //bcr_aliquot_uuid
+				patient = aliquots.get(aliquotUUID);
+				
+                // there seems to be some empty lines at the end of the file - FlyAtlas
+                if (StringUtils.isEmpty(aliquotUUID) || (patient==null)) {
+                    break;
+                }
+				
+				
+                Item cnv = createItem("TCGACNV");
+
+                // extract informations
+                for (int i = 0; i < headers.length; i++) {
+                    String col = headers[i];
+					cnv.setAttribute(col, line[i]);
+                }
+				cnv.setReference("patient", patient);
+				//cnv.addCollection("genes", patient);
+                store(cnv);
+                
+            }
+            lineNumber++;
+		}
+	}
 	
 
+	private void processAliquot(Reader reader, Item submission, Item organism)
+		throws IOException, ObjectStoreException {
+        Iterator<?> tsvIter;
+        try {
+            tsvIter = FormattedTextParser.parseTabDelimitedReader(reader);
+        } catch (Exception e) {
+            throw new BuildException("cannot parse file: " + getCurrentFile(), e);
+        }
+        String [] headers = null;
+        int lineNumber = 0;
+		Item patient = null;
+
+        //drugs = new HashMap<String, String>();
+
+        while (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+
+            if (lineNumber == 0) {
+                // column headers - strip off any extra columns - FlyAtlas
+                // not necessary for FlyExpressionScore, but OK to keep the code
+                int end = 0;
+                for (int i = 0; i < line.length; i++) {
+                    if (StringUtils.isEmpty(line[i])) {
+                        break;
+                    }
+                    end++;
+                }
+                headers = new String[end];
+                System.arraycopy(line, 0, headers, 0, end);
+				
+				//skip one useless line following the header
+				line = (String[]) tsvIter.next();
+				lineNumber +=1;
+				
+            } else {
+                String patientUUID = line[0]; //bcr_patient_uuid
+				if (lineNumber == 2) {
+					//load patient
+					patient = patients.get(patientUUID);
+				}
+                String aliquotUUID = line[3]; //bcr_aliquot_uuid
+				
+                // there seems to be some empty lines at the end of the file - FlyAtlas
+                if (StringUtils.isEmpty(patientUUID) || StringUtils.isEmpty(aliquotUUID) || (patient==null)) {
+                    break;
+                }
+				aliquots.put(aliquotUUID, patient);
+
+            }
+            lineNumber++;
+		}
+	}
+	
 	
 	private void processClinical(Reader reader, Item submission, Item organism, String type)
 		throws IOException, ObjectStoreException {
@@ -154,16 +276,16 @@ public class TcgaConverter extends BioFileConverter
                 if (StringUtils.isEmpty(patientUUID)) {
                     break;
                 }
-                Item drug = createItem(type);
+                Item item = createItem(type);
 				//Item patient = patients.get(patientUUID);
 
                 // extract informations
                 for (int i = 0; i < headers.length; i++) {
                     String col = headers[i];
-					drug.setAttribute(col, line[i]);
+					item.setAttribute(col, line[i]);
                 }
-				drug.setReference("patient", patients.get(patientUUID));
-                store(drug);
+				item.setReference("patient", patients.get(patientUUID));
+                store(item);
 
             }
             lineNumber++;
@@ -182,6 +304,7 @@ public class TcgaConverter extends BioFileConverter
         int lineNumber = 0;
 
         patients = new HashMap<String, Item>();
+        aliquots = new HashMap<String, Item>();
 
         while (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();

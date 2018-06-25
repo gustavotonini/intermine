@@ -2,6 +2,7 @@
 <classes>
   <class name="TCGAPatient" is-interface="true">
 	<attribute name="bcr_patient_uuid" type="java.lang.String"/>
+	<attribute name="bcr_aliquot_uuid" type="java.lang.String"/>
 	<attribute name="bcr_patient_barcode" type="java.lang.String"/>
 	<attribute name="form_completion_date" type="java.lang.String"/>
 	<attribute name="prospective_collection" type="java.lang.String"/>
@@ -59,6 +60,10 @@
 	<attribute name="tissue_source_site" type="java.lang.String"/>
 	<attribute name="tumor_tissue_site" type="java.lang.String"/>
 	<collection name="followups" referenced-type="TCGAClinicalFollowUp" reverse-reference="patient"/>
+	<collection name="followups_nte" referenced-type="TCGAClinicalFollowUpNTE" reverse-reference="patient"/>
+	<collection name="drugs" referenced-type="TCGAClinicalDrug" reverse-reference="patient"/>
+	<collection name="radiation" referenced-type="TCGAClinicalRadiation" reverse-reference="patient"/>
+	<collection name="cnvs" referenced-type="TCGACNV" reverse-reference="patient"/>
   </class>
   
   <class name="TCGADrug" is-interface="true">
@@ -134,5 +139,38 @@
 	<reference name="drug" referenced-type="TCGADrug"/>
 	<reference name="patient" referenced-type="TCGAPatient"/>
   </class>
+  <class name="TCGAClinicalRadiation" is-interface="true">
+	<attribute name="bcr_patient_uuid" type="java.lang.String"/>
+	<attribute name="bcr_patient_barcode" type="java.lang.String"/>
+	<attribute name="bcr_radiation_barcode" type="java.lang.String"/>
+	<attribute name="bcr_radiation_uuid" type="java.lang.String"/>
+	<attribute name="form_completion_date" type="java.lang.String"/>
+	<attribute name="radiation_therapy_type" type="java.lang.String"/>
+	<attribute name="radiation_therapy_site" type="java.lang.String"/>
+	<attribute name="radiation_total_dose" type="java.lang.String"/>
+	<attribute name="radiation_adjuvant_units" type="java.lang.String"/>
+	<attribute name="radiation_adjuvant_fractions_total" type="java.lang.String"/>
+	<attribute name="radiation_therapy_ongoing_indicator" type="java.lang.String"/>
+	<attribute name="course_number" type="java.lang.String"/>
+	<attribute name="days_to_radiation_therapy_end" type="java.lang.String"/>
+	<attribute name="days_to_radiation_therapy_start" type="java.lang.String"/>
+	<attribute name="measure_of_response" type="java.lang.String"/>
+	<attribute name="radiation_type_other" type="java.lang.String"/>
+	<attribute name="therapy_regimen" type="java.lang.String"/>
+	<attribute name="therapy_regimen_other" type="java.lang.String"/>
+	<reference name="patient" referenced-type="TCGAPatient"/>
+  </class>
+  
+  
+  <class name="TCGACNV" is-interface="true">
+	<attribute name="GDC_Aliquot" type="java.lang.String"/>
+	<attribute name="Chromosome" type="java.lang.String"/>
+	<attribute name="Start" type="java.lang.Integer"/>
+	<attribute name="End" type="java.lang.Integer"/>
+	<attribute name="Num_Probes" type="java.lang.Integer"/>
+	<attribute name="Segment_Mean" type="java.lang.Float"/>
+	<reference name="patient" referenced-type="TCGAPatient"/>
+	<collection name="genes" referenced-type="Gene"/>
+  </class>  
   
 </classes>

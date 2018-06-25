@@ -5,10 +5,13 @@
   <property name="intermine.properties.file" value="tcgamine.properties"/>
   <property name="default.intermine.properties.file" location="../default.intermine.integrate.properties"/>
   <sources>
-
-  <source name="tcga" type="tcga">
-    <property name="src.data.dir" location="/home/gustavo/tcga/"/>
-  </source>
+    <source name="ncbi-gene" type="ncbi-gene">
+      <property name="src.data.dir" location="/home/gustavo/tcga/ncbi/current" />
+      <property name="organisms" value="9606" />
+    </source>
+    <source name="tcga" type="tcga">
+      <property name="src.data.dir" location="/home/gustavo/tcga/"/>
+    </source>
 
   </sources>
 
