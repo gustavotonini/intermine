@@ -6,8 +6,21 @@
   <property name="default.intermine.properties.file" location="../default.intermine.integrate.properties"/>
   <sources>
     <source name="ncbi-gene" type="ncbi-gene">
-      <property name="src.data.dir" location="/home/gustavo/tcga/ncbi/current" />
+      <property name="src.data.dir" location="/home/gustavo/ncbi/gene/" />
       <property name="organisms" value="9606" />
+    </source>
+	<!--
+    <source name="uniprot" type="uniprot">
+      <property name="uniprot.organisms" value="9606 10090" />
+      <property name="src.data.dir" location="/home/gustavo/uniprot/" />
+    </source>
+	-->
+    <source name="ncbi-gff" type="ncbi-gff">
+      <property name="gff3.taxonId" value="9606"/>
+      <property name="gff3.seqClsName" value="Chromosome"/>
+      <property name="gff3.dataSourceName" value="NCBI"/>
+      <property name="gff3.dataSetTitle" value="NCBI gff3 data set"/>
+      <property name="src.data.dir" location="/home/gustavo/ncbi/gff/"/>
     </source>
     <source name="tcga" type="tcga">
       <property name="src.data.dir" location="/home/gustavo/tcga/"/>

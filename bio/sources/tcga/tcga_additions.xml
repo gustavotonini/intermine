@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <classes>
+
   <class name="TCGAPatient" is-interface="true">
 	<attribute name="bcr_patient_uuid" type="java.lang.String"/>
 	<attribute name="bcr_aliquot_uuid" type="java.lang.String"/>

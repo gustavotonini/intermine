@@ -102,7 +102,7 @@ public class TcgaConverter extends BioFileConverter
         } else if ("3_nationwidechildrens.org_biospecimen_aliquot_ov.txt"
                 .equals(currentFile.getName())) {
             processAliquot(reader, sub, org);
-        } else if (currentFile.getName().matches("4_SOURS_p_.*SNP_N_GenomeWideSNP.*.seg.v2.txt") ) {
+        } else if (currentFile.getName().matches("4_.*GenomeWideSNP.*.seg.v2.txt") ) {
             processCNV(reader, sub, org);			
         } else {
             throw new IllegalArgumentException("Unexpected file: "
@@ -150,10 +150,6 @@ public class TcgaConverter extends BioFileConverter
                 }
                 headers = new String[end];
                 System.arraycopy(line, 0, headers, 0, end);
-				
-				//skip one useless line following the header
-				line = (String[]) tsvIter.next();
-				lineNumber +=1;
 				
             } else {
                 String aliquotUUID = line[0]; //bcr_aliquot_uuid
