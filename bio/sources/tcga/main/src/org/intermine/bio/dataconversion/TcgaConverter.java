@@ -84,8 +84,8 @@ public class TcgaConverter extends BioFileConverter
         // The following code works out which file we are reading and calls the corresponding method
         File currentFile = getCurrentFile();
 
-        if ("1_nationwidechildrens.org_clinical_patient_ov.txt"
-                .equals(currentFile.getName())) {
+        //if ("1_nationwidechildrens.org_clinical_patient_ov.txt"
+		if (currentFile.getName().matches("nationwidechildrens.org_clinical_patient_.*.txt") ) {
             processPatientsFile(reader, sub, org);
         } else if ("2_nationwidechildrens.org_clinical_drug_ov.txt"
                 .equals(currentFile.getName())) {
@@ -347,3 +347,4 @@ public class TcgaConverter extends BioFileConverter
     }
 
 }
+
